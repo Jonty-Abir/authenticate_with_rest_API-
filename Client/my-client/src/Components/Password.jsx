@@ -1,12 +1,25 @@
 import { useFormik } from "formik";
 import React from "react";
-import { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { toast, Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import Img from "../assets/profile.png";
+import { verifyPassword } from "../helpers/helper";
 import { validatePassword } from "../helpers/validate.js";
+import useHook from "../hooks/useFetch";
 import Classes from "../styles/Username.module.css";
 
 function Password() {
+  const navigate = useNavigate();
+  const { userName } = useSelector((state) => {
+    return state.userDetailsSclice;
+  });
+
+  // call our custom hook
+  const [{ apiData, isLoading, serverError }] = useHook(
+    `/user/userName?userName=${userName}`
+  );
+
   const formik = useFormik({
     initialValues: {
       password: "",
@@ -15,9 +28,32 @@ function Password() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      console.log(value);
+      let loginPromise = verifyPassword({ userName, password: value.password });
+      toast.promise(loginPromise, {
+        loading: "Loging...",
+        success: <b>Login Successfull...</b>,
+        error: <b>Could not login!</b>,
+      });
+      loginPromise.then((data) => {
+        const {
+          data: { token },
+        } = data;
+        localStorage.setItem("token", token);
+        const clear = setTimeout(() => {
+          navigate("/profile");
+          cancel();
+        }, 1400);
+        const cancel = () => {
+          clearTimeout(clear);
+        };
+      });
     },
   });
+  if (serverError) return <code className="text-red-500">{serverError}</code>;
+  ///***_______  lading components   ________**/
+
+  if (isLoading)
+    return <h2 className="text-gray-800 font-bold text-xl">Loading...</h2>;
   return (
     <div className="container mx-auto">
       <Toaster
@@ -32,14 +68,18 @@ function Password() {
       <div className=" flex justify-center items-center h-screen">
         <div className={`${Classes.glass}`}>
           <div className="title flex flex-col items-center">
-            <h4 className=" text-5xl font-bold">Hello Again</h4>
+            <h4 className=" text-5xl font-bold">Hello {apiData?.firstName}</h4>
             <span className="py-4 text-xl w-2/3 text-center text-gray-500">
               Explore More by Connecting with us.
             </span>
           </div>
           <form onSubmit={formik.handleSubmit}>
             <div className="profile flex justify-center py-4">
-              <img className={Classes.profile_img} src={Img} alt="avatar" />
+              <img
+                className={Classes.profile_img}
+                src={apiData?.avatar || Img}
+                alt="avatar"
+              />
             </div>
             <div className="textbox flex flex-col items-center gap-6">
               <input

@@ -8,15 +8,31 @@ import Profile from "./Components/Profile";
 import Recovery from "./Components/Recovery";
 import Register from "./Components/Register";
 import Reset from "./Components/Reset";
-
+import { AuthorizeUser, ProtectRoute } from "./middlewares/Auth";
 /* */
+/***_______     ________**/
 
 function App() {
   const router = createBrowserRouter([
     { path: "/", element: <Login /> },
     { path: "/register", element: <Register /> },
-    { path: "/password", element: <Password /> },
-    { path: "/profile", element: <Profile /> },
+    {
+      path: "/password",
+      element: (
+        <ProtectRoute>
+          <Password />
+        </ProtectRoute>
+      ),
+    },
+    {
+      path: "/profile",
+      element: (
+        <AuthorizeUser>
+          {" "}
+          <Profile />
+        </AuthorizeUser>
+      ),
+    },
     { path: "/reset", element: <Reset /> },
     { path: "/recovery", element: <Recovery /> },
     { path: "*", element: <NotFound /> },

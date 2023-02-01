@@ -1,22 +1,67 @@
 import { useFormik } from "formik";
-import React from "react";
-import { Toaster } from "react-hot-toast";
-import { resetValidatePassword } from "../helpers/validate";
+import React, { useEffect } from "react";
+import { toast, Toaster } from "react-hot-toast";
+import { useSelector } from "react-redux";
+import { Navigate, useNavigate } from "react-router-dom";
+import { resetPassword } from "../helpers/helper";
+import useCustom from "../hooks/useCustom";
 import Classes from "../styles/Username.module.css";
 
 function Reset() {
+  const navigate = useNavigate();
+  const userName = useSelector((state) => state.userDetailsSclice.userName);
+  const [{ isLoading, apiData, status, serverError }] = useCustom();
+  useEffect(() => {
+    console.log(apiData, isLoading);
+  }, [apiData, isLoading]);
+  /***_______  formik   ________**/
   const formik = useFormik({
     initialValues: {
       password: "",
       confirmPassword: "",
     },
-    validate: resetValidatePassword,
+    // validate: resetValidatePassword,
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      console.log(value);
+      try {
+        const specialChars = /[`!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~]/;
+        if (value.password < 4 || value.confirmPassword.length < 4)
+          return toast.error("4 Character must");
+        if (value.password !== value.confirmPassword)
+          return toast.error("Both Password are not same!");
+        if (
+          !specialChars.test(value.password) ||
+          !specialChars.test(value.confirmPassword)
+        )
+          return toast.error("Specil character need");
+        const promiseReset = resetPassword({
+          email: userName,
+          password: value.confirmPassword,
+        });
+        toast.promise(promiseReset, {
+          loading: "Updateing...",
+          success: <b>Updateing Successfull...</b>,
+          error: <b>Couldn't update Password!</b>,
+        });
+        promiseReset.then(() => {
+          return navigate("/password");
+        });
+      } catch (err) {
+        return toast.error("Password update fail!");
+      }
     },
   });
+
+  if (isLoading) return <h1 className="text-2xl font-bold">Loading...</h1>;
+  if (serverError)
+    return (
+      <code className="text-red-500 font-semibold text-xl">
+        {serverError?.message}
+      </code>
+    );
+  if (status && status !== 201)
+    return <Navigate to={"/password"} replace={true}></Navigate>;
   return (
     <div className="container mx-auto">
       <Toaster
@@ -52,6 +97,8 @@ function Reset() {
                 className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 py-2"
                 type="password"
                 placeholder="Confirm Password"
+                required
+                minLength={4}
               />
               <button className={`${Classes.btn} bg-blue-500`} type="submit">
                 Reset

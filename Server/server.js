@@ -29,7 +29,7 @@ app.use(express.json());
 // handle cros
 app.use(
   cors({
-    origin: "localhost:3000",
+    origin: "http://localhost:3000",
     methods: ["GET", "POST", "PUT"],
   })
 );

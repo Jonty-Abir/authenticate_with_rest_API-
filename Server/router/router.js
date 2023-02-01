@@ -1,6 +1,6 @@
-const jwt = require("jsonwebtoken");
 const express = require("express");
 const router = express.Router();
+const { regiesterMail } = require("../Controllers/mailer");
 
 /***_______  import all routes  ________**/
 
@@ -21,12 +21,12 @@ const { Auth, localVariables } = require("../Middlewares/common/Auth");
 /***_______  POST Methods   ________**/
 router.post("/login", verifyUser, logInController); // log in app
 router.post("/signUp", signUpController); // register user
-router.post("/registerMail", registerMailController); // send the mail
-router.post("/authenticate", (req, res, next) => {
-  res.send("auth user");
+router.post("/registerMail", verifyUser, regiesterMail); // send the mail
+router.post("/authenticate", (req, res, next) => { 
+  res.status(200).send("auth user");
 }); // authenticate user
 /***_______  GET methods  ________**/
-router.get("/user/:userName", Auth, getUserController); // user with userName
+router.get("/user/userName", getUserController); // user with userName
 router.get("/generateOTP", verifyUser, localVariables, generateOTPController); // genarate OTP
 router.get("/verifyOTP", verifyUser, verifyOTPController); // verifyOTP
 router.get("/createResetSession", createResetSessionController); // reset all the varables

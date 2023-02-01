@@ -10,7 +10,7 @@ async function signUpController(req, res, next) {
     // check the existing user
     const existUserName = new Promise(async (resolve, reject) => {
       const user = await UserModle.findOne({ userName });
-      if (user) reject({ error: "please use uniqe useName" });
+      if (user) reject({ error: "please use uniqe userName" });
       resolve();
     });
     // check the existing email
@@ -22,6 +22,8 @@ async function signUpController(req, res, next) {
 
     Promise.all([existEmail, existUserName])
       .then(async () => {
+        if (!password)
+          return res.status(500).json({ error: "Password is required*" });
         if (password) {
           const hashPassword = await bcrypt.hash(password, 10);
           const userObj = {
@@ -34,7 +36,7 @@ async function signUpController(req, res, next) {
           user
             .save()
             .then(() => {
-              res.status(200).json("User Register Succesfull.");
+              res.status(200).json({ msg: "User Register Succesfull." });
             })
             .catch((err) => {
               res.status(500).json({ error: err.message });
@@ -92,22 +94,22 @@ async function logInController(req, res, next) {
   }
 }
 
-/***_______POST  RegisterMail Controller  http://localhost:8080/registerMail   ________**/
-function registerMailController(req, res, next) {
-  res.json({ msg: "RegisterMail successfull" });
-}
-
 /***_______ GET Get User Controller  http://localhost:8080//user/:userName   ________**/
 async function getUserController(req, res, next) {
   try {
-    const { userName } = req.params;
+    const { userName } = req.query;
     if (!userName) return res.status(501).json({ error: "Ivalid user" });
-    UserModle.findOne({ userName }, (err, user) => {
-      if (err) return res.status(500).json({ error: err.message });
-      if (!user) return res.status(404).json({ error: "Can't found user" });
-      const { password, ...rest } = Object.assign({}, user.toJSON());
-      res.status(200).json(rest);
-    });
+    UserModle.findOne(
+      {
+        $or: [{ email: userName }, { userName: userName }],
+      },
+      (err, user) => {
+        if (err) return res.status(500).json({ error: err.message });
+        if (!user) return res.status(500).json({ error: "Can't found user" });
+        const { password, ...rest } = Object.assign({}, user.toJSON());
+        res.status(200).json(rest);
+      }
+    );
   } catch (err) {
     res.status(404).json({ error: "can't find user data." });
   }
@@ -125,21 +127,23 @@ async function generateOTPController(req, res, next) {
 
 /***_______GET  verifyOTPController  http://localhost:8080/verifyOTP   ________**/
 function verifyOTPController(req, res, next) {
-  const { code } = req.query;
-
+  const { code, email } = req.query;
   if (parseInt(req.app.locals.OTP) === parseInt(code)) {
     req.app.locals.OTP = null; // reset otp value
     req.app.locals.resetSession = true; // start session for reset password
-    res.status(201).json({ msg: "OTP verify Successfull" });
+    return res.status(201).json({ msg: "OTP verify Successfull" });
   }
+
   res.status(400).json({ error: "Invalid OTP!" });
 }
 
 /***_______ GET createResetSession controller  http://localhost:8080/createResetSession   ________**/
 function createResetSessionController(req, res, next) {
   if (req.app.locals.resetSession) {
-    req.app.locals.resetSession = false; //
-    return res.status(201).json({ msg: "access granted" });
+    // req.app.locals.resetSession = false; //
+    return res
+      .status(201)
+      .json({ msg: "access granted", flag: req.app.locals.resetSession });
   }
   res.status(440).json({ error: "session is expire." });
 }
@@ -148,9 +152,21 @@ function createResetSessionController(req, res, next) {
 async function updateuserController(req, res, next) {
   try {
     // i get user auth middleware
-    const { userId, userName } = req.user;
+    const { userId } = req.user;
     if (userId) {
       const body = req.body;
+      const { email, userName } = req.body;
+      /***_______  check client send uniqe email userName   ________**/
+
+      if (email || userName) {
+        const user = await UserModle.findOne({
+          $or: [{ email: email }, { userName: userName }],
+        });
+        if (user && email)
+          return res.status(500).json({ error: "This email not available" });
+        if (user && userName)
+          return res.status(500).json({ error: "This userName not available" });
+      }
       // update the user
       UserModle.findByIdAndUpdate(
         { _id: userId },
@@ -159,9 +175,10 @@ async function updateuserController(req, res, next) {
         (err, data) => {
           if (err) throw err;
           if (data) {
+            const { password, ...rest } = Object.assign({}, data.toJSON());
             res.status(200).json({
               msg: "User Update Successfull",
-              updatedUserDetails: data,
+              updatedUserDetails: rest,
             });
           }
         }
@@ -178,6 +195,7 @@ async function resetPasswordController(req, res, next) {
     return res.status(440).json({ error: "Session is expire..!" });
   try {
     const { email, password } = req.body;
+    console.log(req.body);
     UserModle.findOne({ email })
       .then((user) => {
         bcrypt
@@ -210,7 +228,6 @@ async function resetPasswordController(req, res, next) {
 module.exports = {
   signUpController,
   logInController,
-  registerMailController,
   getUserController,
   generateOTPController,
   verifyOTPController,

@@ -1,15 +1,17 @@
 import { useFormik } from "formik";
 import React, { useState } from "react";
-import { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { toast, Toaster } from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
 import Img from "../assets/profile.png";
 import { convertToBase64 } from "../helpers/convert.js";
+import { registerUser } from "../helpers/helper";
 import { registerValidattio } from "../helpers/validate.js";
 import Classes from "../styles/Username.module.css";
 
 function Register() {
   const [file, setFile] = useState("");
 
+  const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -20,8 +22,22 @@ function Register() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      console.log(value);
-      value = await Object.assign(value, { profile: file || "" });
+      value = await Object.assign(value, { avatar: file || "" });
+      let registerPromise = registerUser(value);
+      toast.promise(registerPromise, {
+        loading: "Creating...",
+        success: <b>Register Successfulll...!</b>,
+        error: <b>Could not register.</b>,
+      });
+      registerPromise.then(() => {
+        const clear = setTimeout(() => {
+          navigate("/");
+          cancel();
+        }, 1400);
+        const cancel = () => {
+          clearTimeout(clear);
+        };
+      });
     },
   });
 
@@ -57,6 +73,7 @@ function Register() {
                   className={Classes.profile_img}
                   src={file || Img}
                   alt="avatar"
+                  name="avatar"
                 />
               </label>
               <input

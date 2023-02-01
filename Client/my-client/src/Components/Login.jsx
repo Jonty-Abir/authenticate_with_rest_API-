@@ -1,12 +1,18 @@
 import { useFormik } from "formik";
 import React from "react";
-import { Toaster } from "react-hot-toast";
-import { Link } from "react-router-dom";
+import { toast, Toaster } from "react-hot-toast";
+import { useDispatch } from "react-redux";
+import { Link, useNavigate } from "react-router-dom";
 import Img from "../assets/profile.png";
+import { getUser } from "../helpers/helper";
 import { emailValidate } from "../helpers/validate.js";
+import { setStateStore } from "../state/state";
 import Classes from "../styles/Username.module.css";
 
 function Login() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -15,7 +21,15 @@ function Login() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      console.log(value);
+      dispatch(setStateStore(value.email));
+      const { data } = await getUser({
+        userName: `userName?userName=${value.email}`,
+      });
+      if (data?.email) {
+        navigate("/password");
+      } else {
+        toast.error("user not found!");
+      }
     },
   });
   return (
