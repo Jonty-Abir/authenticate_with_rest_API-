@@ -53,7 +53,14 @@ function Profile() {
   };
   /***_______  loading componet   ________**/
   if (isLoading)
-    return <div className="text-gray-700 font-bold text-lg">Loading....</div>;
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <h2 className="text-gray-800 dark:text-gray-50 font-bold text-6xl">
+          Loading...
+        </h2>
+        ;
+      </div>
+    );
   if (serverError)
     return <div className="text-red-500 text-xl">{serverError}</div>;
   return (

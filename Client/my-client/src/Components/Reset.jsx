@@ -53,7 +53,15 @@ function Reset() {
     },
   });
 
-  if (isLoading) return <h1 className="text-2xl font-bold">Loading...</h1>;
+  if (isLoading)
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <h2 className="text-gray-800 dark:text-gray-50 font-bold text-6xl">
+          Loading...
+        </h2>
+        ;
+      </div>
+    );
   if (serverError)
     return (
       <code className="text-red-500 font-semibold text-xl">

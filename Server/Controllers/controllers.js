@@ -36,7 +36,7 @@ async function signUpController(req, res, next) {
           user
             .save()
             .then(() => {
-              res.status(200).json({ msg: "User Register Succesfull." });
+              res.status(200).json({ msg: "Your Registration Successfull. 🔥 " });
             })
             .catch((err) => {
               res.status(500).json({ error: err.message });

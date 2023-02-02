@@ -53,7 +53,14 @@ function Password() {
   ///***_______  lading components   ________**/
 
   if (isLoading)
-    return <h2 className="text-gray-800 font-bold text-xl">Loading...</h2>;
+    return (
+      <div className="w-screen h-screen flex justify-center items-center">
+        <h2 className="text-gray-800 dark:text-gray-50 font-bold text-6xl">
+          Loading...
+        </h2>
+        ;
+      </div>
+    );
   return (
     <div className="container mx-auto">
       <Toaster
