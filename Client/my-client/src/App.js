@@ -38,7 +38,7 @@ function App() {
     { path: "*", element: <NotFound /> },
   ]);
   return (
-    <main className=" flex flex-col h-full w-screen justify-center items-center">
+    <main className="main flex flex-col h-full w-screen justify-center items-center">
       <RouterProvider router={router}></RouterProvider>
     </main>
   );

@@ -13,6 +13,7 @@ doteEnv.config({ path: ".env" });
 // create app
 const app = express();
 mongoose.set("strictQuery", false);
+/***_______ LOCAL= mongodb://127.0.0.1:27017/Abir    ________**/
 mongoose
   .connect(process.env.CONNECTION_SRT, {
     useNewUrlParser: true,
@@ -25,7 +26,7 @@ mongoose
     console.log(err);
   });
 
-app.use(express.json());
+app.use(express.json({limit:"5mb"}));
 // handle cros
 app.use(
   cors({
@@ -36,7 +37,7 @@ app.use(
 app.use(morgan("tiny"));
 
 app.get("/", (req, res, next) => {
-  console.log(app.locals === req.app.locals)
+  console.log(app.locals === req.app.locals);
   res.json({
     msg: "OK",
   });

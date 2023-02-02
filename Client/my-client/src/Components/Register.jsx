@@ -59,10 +59,10 @@ function Register() {
         reverseOrder={false}
       ></Toaster>
       <div className=" flex justify-center items-center h-screen">
-        <div className={`${Classes.glass}`}>
+        <div className={`${Classes.glass} dark:bg-gray-600 dark:text-gray-50`}>
           <div className="title flex flex-col items-center">
             <h4 className=" text-5xl font-bold">Register</h4>
-            <span className="py-4 text-xl w-2/3 text-center text-gray-500">
+            <span className="py-4 text-xl w-2/3 text-center text-gray-500 dark:text-gray-300">
               Happy to enjoy you.
             </span>
           </div>
@@ -107,9 +107,9 @@ function Register() {
               </button>
             </div>
             <div className="text-center py-4">
-              <span className="text-gray-500">
+              <span className="text-gray-500 dark:text-gray-200">
                 Already registure{" "}
-                <Link className="text-red-500" to="/">
+                <Link className="text-red-500 font-bold ml-2" to="/">
                   Login now
                 </Link>
               </span>

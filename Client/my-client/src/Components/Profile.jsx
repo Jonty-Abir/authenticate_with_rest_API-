@@ -57,7 +57,7 @@ function Profile() {
   if (serverError)
     return <div className="text-red-500 text-xl">{serverError}</div>;
   return (
-    <div className="container mx-auto">
+    <div className="container mx-auto ">
       <Toaster
         position="top-center"
         toastOptions={{
@@ -68,15 +68,19 @@ function Profile() {
         reverseOrder={false}
       ></Toaster>
       <div className=" flex justify-center items-center my-6">
-        <div className={`${Classes.glass} ${Extend.glass}`}>
+        <div
+          className={` dark:bg-gray-800 text-gray-300 rounded-md h-full py-8 mob-md:w-screen mob-lg:w-auto`}
+        >
           <div className="title flex flex-col items-center">
-            <h4 className=" text-5xl font-bold">Profile</h4>
-            <span className="py-4 text-xl w-2/3 text-center text-gray-500">
+            <h4 className=" text-5xl font-bold uppercase text-gray-50">
+              Profile
+            </h4>
+            <span className="py-4 text-xl w-2/3 text-center text-gray-400">
               You can update profile.
             </span>
           </div>
           <form onSubmit={formik.handleSubmit}>
-            <div className="profile flex justify-center py-4">
+            <div className="profile flex justify-center py-4 ">
               <label htmlFor="profilePicture">
                 <img
                   className={`${Classes.profile_img} ${Extend.profile_img}`}
@@ -91,8 +95,8 @@ function Profile() {
                 name="avatar"
               />
             </div>
-            <div className="textbox flex flex-col items-center gap-6">
-              <div className="name flex w-3/4 gap-10">
+            <div className=" flex flex-col items-center gap-6 pt-5">
+              <div className="name flex  gap-10 mob-sm:flex-col mob-sm:gap-4 justify-center items-center w-[90%] mob-lg:flex-row mob-lg:gap-4 ">
                 <input
                   {...formik.getFieldProps("firstName")}
                   className={`${Extend.textbox} px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 py-2`}
@@ -106,7 +110,7 @@ function Profile() {
                   placeholder="Last Name"
                 />
               </div>
-              <div className="name flex w-3/4 gap-10">
+              <div className="name flex  gap-10 mob-sm:flex-col mob-sm:gap-4 justify-center items-center w-[90%] mob-lg:flex-row mob-lg:gap-4 ">
                 <input
                   {...formik.getFieldProps("mobile")}
                   className={`${Extend.textbox} px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 py-2`}
@@ -120,7 +124,7 @@ function Profile() {
                   placeholder="gender"
                 />
               </div>
-              <div className="name flex w-3/4 gap-10">
+              <div className="name flex  gap-10 mob-sm:flex-col mob-sm:gap-4 justify-center items-center w-[70%] mob-lg:w-[90%] mob-lg:gap-10">
                 <input
                   {...formik.getFieldProps("address")}
                   className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 w-full py-2"
@@ -133,7 +137,7 @@ function Profile() {
               </button>
             </div>
             <div className="text-center py-4">
-              <span className="text-gray-500">
+              <span className="text-gray-400">
                 Come back later?{" "}
                 <Link className="text-red-500" onClick={logOut} to="/">
                   Log Out

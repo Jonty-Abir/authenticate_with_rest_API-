@@ -34,8 +34,5 @@
 }
 
 .btn {
-  @apply border bg-indigo-500 w-3/4  py-3 rounded-lg  text-xl text-gray-50 shadow-sm;
-}
-.btn:hover {
-  background-color: #ff6a6a;
+  @apply border bg-indigo-500 w-3/4  py-3 rounded-lg  text-xl text-white shadow-sm hover:bg-green-500;
 }

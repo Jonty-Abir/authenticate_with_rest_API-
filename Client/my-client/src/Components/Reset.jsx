@@ -74,10 +74,12 @@ function Reset() {
         reverseOrder={false}
       ></Toaster>
       <div className=" flex justify-center items-center h-screen">
-        <div className={`${Classes.glass} pb-8`}>
+        <div
+          className={`${Classes.glass} dark:bg-gray-600 dark:text-gray-50 pb-14`}
+        >
           <div className="title flex flex-col items-center">
             <h4 className=" text-5xl font-bold">Reset</h4>
-            <span className="py-4 text-xl w-2/3 text-center text-gray-500">
+            <span className="py-4 text-xl w-2/3 text-center text-gray-500 dark:text-gray-300">
               Enter new password
             </span>
           </div>
@@ -88,20 +90,20 @@ function Reset() {
             <div className="textbox flex flex-col items-center gap-6">
               <input
                 {...formik.getFieldProps("password")}
-                className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 py-2"
+                className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-500 py-2"
                 type="password"
                 placeholder="New Password"
               />
               <input
                 {...formik.getFieldProps("confirmPassword")}
-                className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-300 py-2"
+                className="px-4 focus:outline-none rounded-md focus:ring-2 focus:ring-green-500 py-2"
                 type="password"
                 placeholder="Confirm Password"
                 required
                 minLength={4}
               />
               <button className={`${Classes.btn} bg-blue-500`} type="submit">
-                Reset
+                Reset Now
               </button>
             </div>
           </form>

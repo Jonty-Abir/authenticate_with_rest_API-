@@ -12,8 +12,22 @@ body {
   background: #dcdce6;
   background-image: url("./assets/Background.png");
   background-size: cover;
+  overflow-x: hidden;
 }
 
 input[type="file"] {
   display: none;
+}
+
+.main {
+  background: rgb(2, 0, 36);
+  background: linear-gradient(
+    90deg,
+    rgba(2, 0, 36, 1) 0%,
+    rgba(9, 9, 121, 0.4374124649859944) 45%,
+    rgba(0, 212, 255, 1) 100%
+  );
+}
+input {
+  color: rgb(15, 15, 15);
 }
