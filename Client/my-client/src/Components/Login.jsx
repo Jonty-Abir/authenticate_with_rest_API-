@@ -1,8 +1,9 @@
 import { useFormik } from "formik";
-import React from "react";
+import React, { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import gif from "../assets/loading.svg";
 import Img from "../assets/profile.png";
 import { getUser } from "../helpers/helper";
 import { emailValidate } from "../helpers/validate.js";
@@ -12,7 +13,7 @@ import Classes from "../styles/Username.module.css";
 function Login() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const [wait, setWait] = useState(false);
   const formik = useFormik({
     initialValues: {
       email: "",
@@ -21,14 +22,22 @@ function Login() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      dispatch(setStateStore(value.email));
-      const { data } = await getUser({
-        userName: `userName?userName=${value.email}`,
-      });
-      if (data?.email) {
-        navigate("/password");
-      } else {
+      try {
+        setWait(true);
+        dispatch(setStateStore(value.email));
+        const { data } = await getUser({
+          userName: `userName?userName=${value.email}`,
+        });
+        if (data?.email) {
+          setWait(false);
+          navigate("/password");
+        } else {
+          setWait(false);
+          toast.error("user not found!");
+        }
+      } catch {
         toast.error("user not found!");
+        setWait(false);
       }
     },
   });
@@ -44,6 +53,16 @@ function Login() {
         reverseOrder={false}
       ></Toaster>
       <div className=" flex justify-center items-center h-screen">
+        <div
+          className={`absolute loading  left-auto z-10 top-auto ${
+            wait ? "" : "hidden"
+          }`}
+        ></div>
+        <div
+          className={`absolute left-auto z-20 top-auto ${wait ? "" : "hidden"}`}
+        >
+          <img width={250} src={gif} alt="GIF" />
+        </div>
         <div className={`${Classes.glass} dark:bg-gray-800  `}>
           <div className="title flex flex-col items-center">
             <h4 className=" text-5xl font-bold dark:text-gray-50">

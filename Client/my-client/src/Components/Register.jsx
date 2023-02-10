@@ -2,6 +2,7 @@ import { useFormik } from "formik";
 import React, { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import gif from "../assets/loading.svg";
 import Img from "../assets/profile.png";
 import { convertToBase64 } from "../helpers/convert.js";
 import { registerUser } from "../helpers/helper";
@@ -10,7 +11,7 @@ import Classes from "../styles/Username.module.css";
 
 function Register() {
   const [file, setFile] = useState("");
-
+  const [isLoading, setLoading] = useState(false);
   const navigate = useNavigate();
   const formik = useFormik({
     initialValues: {
@@ -22,22 +23,32 @@ function Register() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      value = await Object.assign(value, { avatar: file || "" });
-      let registerPromise = registerUser(value);
-      toast.promise(registerPromise, {
-        loading: "Creating...",
-        success: <b>Register Successfulll...!</b>,
-        error: <b>Could not register.</b>,
-      });
-      registerPromise.then(() => {
-        const clear = setTimeout(() => {
-          navigate("/");
-          cancel();
-        }, 1400);
-        const cancel = () => {
-          clearTimeout(clear);
-        };
-      });
+      try {
+        setLoading(true);
+        value = await Object.assign(value, { avatar: file || "" });
+        let registerPromise = registerUser(value);
+        toast.promise(registerPromise, {
+          loading: "Creating...",
+          success: <b>Register Successfulll...!</b>,
+          error: <b>Could not register.</b>,
+        });
+        registerPromise
+          .then(() => {
+            setLoading(false);
+            const clear = setTimeout(() => {
+              navigate("/");
+              cancel();
+            }, 1400);
+            const cancel = () => {
+              clearTimeout(clear);
+            };
+          })
+          .catch((err) => {
+            setLoading(false);
+          });
+      } catch (err) {
+        setLoading(false);
+      }
     },
   });
 
@@ -58,7 +69,19 @@ function Register() {
         }}
         reverseOrder={false}
       ></Toaster>
-      <div className=" flex justify-center items-center h-screen">
+      <div className=" flex justify-center items-center h-screen relative">
+        <div
+          className={`absolute loading  left-auto z-10 top-auto ${
+            isLoading ? "" : "hidden"
+          }`}
+        ></div>
+        <div
+          className={`absolute left-auto z-20 top-auto ${
+            isLoading ? "" : "hidden"
+          }`}
+        >
+          <img width={250} src={gif} alt="GIF" />
+        </div>
         <div className={`${Classes.glass} dark:bg-gray-600 dark:text-gray-50`}>
           <div className="title flex flex-col items-center">
             <h4 className=" text-5xl font-bold">Register</h4>

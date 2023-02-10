@@ -26,11 +26,14 @@ mongoose
     console.log(err);
   });
 
-app.use(express.json({limit:"5mb"}));
+app.use(express.json({ limit: "5mb" }));
 // handle cros
+
+// "http://localhost:3000",
+// https://authenticatewithabir.netlify.app/
 app.use(
   cors({
-    origin: "http://localhost:3000",
+    origin: "*",
     methods: ["GET", "POST", "PUT"],
   })
 );

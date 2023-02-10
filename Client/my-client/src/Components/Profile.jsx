@@ -3,6 +3,8 @@ import React, { useState } from "react";
 import { toast, Toaster } from "react-hot-toast";
 import { useSelector } from "react-redux";
 import { Link, useNavigate } from "react-router-dom";
+import gif from "../assets/loading.svg";
+import defaultImg from "../assets/profile.png";
 import { convertToBase64 } from "../helpers/convert.js";
 import { updateUser } from "../helpers/helper";
 import useHook from "../hooks/useFetch";
@@ -13,6 +15,8 @@ function Profile() {
   const navigate = useNavigate();
   const { userName } = useSelector((state) => state.userDetailsSclice);
   const [file, setFile] = useState("");
+  const [wait, setWait] = useState(false);
+
   const [{ isLoading, apiData, status, serverError }] = useHook(`${userName}`);
   const formik = useFormik({
     initialValues: {
@@ -27,16 +31,24 @@ function Profile() {
     validateOnBlur: false,
     validateOnChange: false,
     onSubmit: async (value) => {
-      value = await Object.assign(value, {
-        avatar: file || apiData?.avatar || "",
-      });
-      let updateUserPromise = updateUser(value);
+      try {
+        setWait(true);
+        value = await Object.assign(value, {
+          avatar: file || apiData?.avatar || "",
+        });
+        let updateUserPromise = updateUser(value);
 
-      toast.promise(updateUserPromise, {
-        loading: "Updateing...",
-        success: <b>Update Successfully...!</b>,
-        error: <b> Could not update!</b>,
-      });
+        toast.promise(updateUserPromise, {
+          loading: "Updateing...",
+          success: <b>Update Successfully...!</b>,
+          error: <b> Could not update!</b>,
+        });
+        updateUserPromise
+          .then(() => setWait(false))
+          .catch((err) => setWait(false));
+      } catch (err) {
+        setWait(false);
+      }
     },
   });
   /***_______   logout Function  ________**/
@@ -63,6 +75,8 @@ function Profile() {
     );
   if (serverError)
     return <div className="text-red-500 text-xl">{serverError}</div>;
+  /***_______  main profile comoponent   ________**/
+
   return (
     <div className="container mx-auto ">
       <Toaster
@@ -75,6 +89,16 @@ function Profile() {
         reverseOrder={false}
       ></Toaster>
       <div className=" flex justify-center items-center my-6">
+        <div
+          className={`absolute loading  left-auto z-10 top-auto ${
+            wait ? "" : "hidden"
+          }`}
+        ></div>
+        <div
+          className={`absolute left-auto z-20 top-auto ${wait ? "" : "hidden"}`}
+        >
+          <img width={250} src={gif} alt="GIF" />
+        </div>
         <div
           className={` dark:bg-gray-800 text-gray-300 rounded-md h-full py-8 mob-md:w-screen mob-lg:w-auto`}
         >
@@ -91,7 +115,7 @@ function Profile() {
               <label htmlFor="profilePicture">
                 <img
                   className={`${Classes.profile_img} ${Extend.profile_img}`}
-                  src={file || apiData?.avatar}
+                  src={file || apiData?.avatar || defaultImg}
                   alt="avatar"
                 />
               </label>
